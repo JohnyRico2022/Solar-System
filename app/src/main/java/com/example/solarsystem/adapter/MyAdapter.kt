@@ -1,6 +1,5 @@
 package com.example.solarsystem.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +10,24 @@ import com.example.solarsystem.R
 import com.example.solarsystem.model.Planets
 
 class MyAdapter(
-    private val context: Context,
-    private val dataset: List<Planets>
-):RecyclerView.Adapter<MyAdapter.ItemViewHolder>() {
+    private val data: List<Planets>,
+    private val listener: RecyclerViewEvents
+) : RecyclerView.Adapter<MyAdapter.ItemViewHolder>() {
 
-    class ItemViewHolder(view: View): RecyclerView.ViewHolder(view){
+    inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
         val name: TextView = view.findViewById(R.id.planetName)
         val picture: ImageView = view.findViewById(R.id.planetPicture)
+
+        init {
+            view.setOnClickListener(this)
+        }
+
+        override fun onClick(p0: View?) {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                listener.onItemClick(position)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -27,14 +37,18 @@ class MyAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val planets = dataset[position]
+        val planets: Planets = data[position]
 
-        holder.name.text = context.resources.getString(planets.planetName)
+        holder.name.text = planets.planetName
         holder.picture.setImageResource(planets.planetPicture)
     }
 
     override fun getItemCount(): Int {
-        return dataset.size
+        return data.size
     }
 
+    interface RecyclerViewEvents {
+        fun onItemClick(position: Int)
+
+    }
 }
